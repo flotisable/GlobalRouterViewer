@@ -1,13 +1,13 @@
 #include <QApplication>
 
-#include "GlobalRouterViewer.h"
+#include "MainWindow.h"
 
 int main( int argc , char *argv[] )
 {
-    QApplication        app( argc , argv );
-    GlobalRouterViewer  viewer;
+    QApplication  app( argc , argv );
+    MainWindow    window;
 
-    viewer.show();
+    window.show();
 
     return app.exec();
 }

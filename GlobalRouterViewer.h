@@ -14,7 +14,7 @@ class GlobalRouterViewer : public QGraphicsView
 
     private:
 
-        QGraphicsScene *scene;
+        QGraphicsScene  *scene;
 };
 
 #endif // GLOBALROUTERVIEWER_H

@@ -3,7 +3,9 @@ QT += widgets
 SOURCES += \
     main.cpp \
     GlobalRouterViewer.cpp \
-    Component/Group.cpp
+    Component/Group.cpp \
+    MainWindow.cpp \
+    RoutingGraphInfo.cpp
 
 HEADERS += \
     GlobalRouterViewer.h \
@@ -11,4 +13,6 @@ HEADERS += \
     Component/Group.h \
     Component/Net.h \
     Component/Pin.h \
-    Component/Symmetry.h
+    Component/Symmetry.h \
+    MainWindow.h \
+    RoutingGraphInfo.h
