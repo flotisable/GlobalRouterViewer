@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QRectF>
+#include <QTextStream>
 
 class Block : public QRectF
 {
@@ -20,6 +21,8 @@ class Block : public QRectF
   
     QString mName;
 };
+
+QTextStream& operator>>( QTextStream &stream , Block &block );
 
 inline Block::Block( const QString &name ) : mName( name ) {}
 inline Block::Block( const QString &name , qreal lbX , qreal lbY , qreal w , qreal h )

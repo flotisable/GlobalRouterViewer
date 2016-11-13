@@ -2,7 +2,8 @@
 #define PIN_H
 
 #include <QPointF>
-#include "Block.h"
+
+class Block;
 
 class Pin : public QPointF
 {

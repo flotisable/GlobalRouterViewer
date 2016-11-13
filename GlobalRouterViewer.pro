@@ -5,7 +5,11 @@ SOURCES += \
     GlobalRouterViewer.cpp \
     Component/Group.cpp \
     MainWindow.cpp \
-    RoutingGraphInfo.cpp
+    RoutingGraphInfo.cpp \
+    Router.cpp \
+    Component/Symmetry.cpp \
+    Component/Block.cpp \
+    Component/Net.cpp
 
 HEADERS += \
     GlobalRouterViewer.h \
@@ -15,4 +19,5 @@ HEADERS += \
     Component/Pin.h \
     Component/Symmetry.h \
     MainWindow.h \
-    RoutingGraphInfo.h
+    RoutingGraphInfo.h \
+    Router.h

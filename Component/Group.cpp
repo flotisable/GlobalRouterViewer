@@ -1,6 +1,5 @@
 #include "Group.h"
 
-#include <iostream>
 #include <algorithm>
 using namespace std;
 
@@ -37,40 +36,17 @@ QVector<QPoint> Group::connectedPin( Net &net )
   return pins;
 }
 
-void Group::buildSplit()
+Block* Group::getBlock( const QString &name )
 {
-  mHsplit.push_back( left   () );
-  mHsplit.push_back( right  () );
-  mVsplit.push_back( top    () );
-  mVsplit.push_back( bottom () );
-
   for( Symmetry &symmetry : symmetrys() )
-     for( const Block &block : symmetry.blocks() )
-     {
-        mHsplit.push_back( block.left   () );
-        mHsplit.push_back( block.right  () );
-        mVsplit.push_back( block.top    () );
-        mVsplit.push_back( block.bottom () );
-     }
-
-  for( const Block &block : blocks() )
   {
-     mHsplit.push_back( block.left   () );
-     mHsplit.push_back( block.right  () );
-     mVsplit.push_back( block.top    () );
-     mVsplit.push_back( block.bottom () );
+     Block *block = symmetry.getBlock( name );
+
+     if( block ) return block;
   }
-
-  sort( mHsplit.begin() , mHsplit.end() );
-  sort( mVsplit.begin() , mVsplit.end() );
-
-  auto it = unique( mHsplit.begin() , mHsplit.end() );
-  
-  mHsplit.resize( distance( mHsplit.begin() , it ) );
-  
-  it = unique( mVsplit.begin() , mVsplit.end() );
-  
-  mVsplit.resize( distance( mVsplit.begin() , it ) );
+  for( Block &block : blocks() )
+     if( block.name() == name ) return &block;
+  return nullptr;
 }
 
 bool Group::netConnected( Net &net )
@@ -80,4 +56,94 @@ bool Group::netConnected( Net &net )
           ( mVsplit.front() <= pin.y() && pin.y() <= mVsplit.back() ) )
        return true;
   return false;
+}
+
+QTextStream &operator>>(QTextStream &stream, Group &group)
+{
+  QString word;
+
+  while( !stream.atEnd() )
+  {
+    word = stream.readLine();
+
+    if( word == "Horizontal Split : " )
+    {
+      while( true )
+      {
+        word = stream.readLine();
+
+        if( word.isEmpty() ) break;
+
+        group.hsplit().push_back( word.toDouble() );
+      }
+      group.setLeft  ( group.hsplit().front () );
+      group.setRight ( group.hsplit().back  () );
+      break;
+    }
+  }
+
+  while( !stream.atEnd() )
+  {
+    word = stream.readLine();
+
+    if( word == "Vertical Split : " )
+    {
+      while( true )
+      {
+        word = stream.readLine();
+
+        if( word.isEmpty() ) break;
+
+        group.vsplit().push_back( word.toDouble() );
+      }
+      group.setBottom( group.vsplit().front () );
+      group.setTop   ( group.vsplit().back  () );
+      break;
+    }
+  }
+
+  while( !stream.atEnd() )
+  {
+    word = stream.readLine();
+
+    if( word == "Symmetrys :" )
+    {
+      while( !stream.atEnd() )
+      {
+        word = stream.readLine();
+
+        if( word.contains( "[ Symmetry : " )  )
+        {
+          Symmetry symmetry;
+
+          symmetry.setName( word.section( ' ' , 3 , 3 ) );
+
+          stream >> symmetry;
+
+          group.symmetrys().push_back( symmetry );
+        }
+        else if( word == "Blocks : " ) break;
+      }
+      break;
+    }
+  }
+
+  if( stream.atEnd() ) return stream;
+
+  if( word == "Blocks :" )
+  {
+    while( !stream.atEnd() )
+    {
+      word = stream.readLine();
+
+      if( word.isEmpty() ) break;
+
+      Block block;
+
+      stream >> block;
+      group.blocks().push_back( block );
+    }
+  }
+
+  return stream;
 }

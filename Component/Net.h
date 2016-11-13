@@ -3,8 +3,9 @@
 
 #include <QVector>
 #include <QString>
-
 #include <QPoint>
+#include <QTextStream>
+
 #include "Pin.h"
 
 class Net
@@ -30,6 +31,8 @@ class Net
     QVector<Pin>    mPins;
     QVector<QPoint> mPath;
 };
+
+QTextStream& operator>>( QTextStream &stream , Net &net );
 
 inline Net::Net( const QString &name ) : mName( name ) {}
 inline Net::Net( const QString &name , int currentDensity )

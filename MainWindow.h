@@ -4,15 +4,26 @@
 #include <QMainWindow>
 
 class QFileDialog;
-class Group;
+class Router;
 class GlobalRouterViewer;
 class RoutingGraphInfo;
 
 class MainWindow : public QMainWindow
 {
+  Q_OBJECT
+
   public:
 
     MainWindow();
+
+  signals:
+
+    void fileRead( Router *routingGraph );
+    void fileRead( const QString &fileName );
+
+  public slots:
+
+    bool read( const QString &fileName );
 
   private:
 
@@ -21,7 +32,7 @@ class MainWindow : public QMainWindow
 
     GlobalRouterViewer  *viewer;
     RoutingGraphInfo    *info;
-    Group               *routingGraph;
+    Router              *routingGraph;
 
     QFileDialog *fileDialog;
 
