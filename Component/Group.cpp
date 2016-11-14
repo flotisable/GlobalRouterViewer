@@ -66,14 +66,13 @@ QTextStream &operator>>(QTextStream &stream, Group &group)
   {
     word = stream.readLine();
 
-    if( word == "Horizontal Split : " )
+    if( word.contains( "Horizontal Split : " ) )
     {
-      while( true )
+      int splitNum = word.section( ' ' , 3 , 3 ).toInt();
+
+      for( int i = 0 ; i < splitNum ; ++i )
       {
         word = stream.readLine();
-
-        if( word.isEmpty() ) break;
-
         group.hsplit().push_back( word.toDouble() );
       }
       group.setLeft  ( group.hsplit().front () );
@@ -86,14 +85,13 @@ QTextStream &operator>>(QTextStream &stream, Group &group)
   {
     word = stream.readLine();
 
-    if( word == "Vertical Split : " )
+    if( word.contains( "Vertical Split : " ) )
     {
-      while( true )
+      int splitNum = word.section( ' ' , 3 , 3 ).toInt();
+
+      for( int i = 0 ; i < splitNum ; ++i )
       {
         word = stream.readLine();
-
-        if( word.isEmpty() ) break;
-
         group.vsplit().push_back( word.toDouble() );
       }
       group.setBottom( group.vsplit().front () );
@@ -106,9 +104,11 @@ QTextStream &operator>>(QTextStream &stream, Group &group)
   {
     word = stream.readLine();
 
-    if( word == "Symmetrys :" )
+    if( word.contains( "Symmetrys : " ) )
     {
-      while( !stream.atEnd() )
+      int SymmetryNum = word.section( ' ' , 2 , 2 ).toInt();
+
+      for( int i = 0 ; !stream.atEnd() && i < SymmetryNum ; )
       {
         word = stream.readLine();
 
@@ -121,27 +121,29 @@ QTextStream &operator>>(QTextStream &stream, Group &group)
           stream >> symmetry;
 
           group.symmetrys().push_back( symmetry );
+          ++i;
         }
-        else if( word == "Blocks : " ) break;
       }
       break;
     }
   }
 
-  if( stream.atEnd() ) return stream;
-
-  if( word == "Blocks :" )
+  while( !stream.atEnd() )
   {
-    while( !stream.atEnd() )
+    word = stream.readLine();
+
+    if( word.contains( "Blocks : " ) )
     {
-      word = stream.readLine();
+      int blockNum = word.section( ' ' , 2 , 2 ).toInt();
 
-      if( word.isEmpty() ) break;
+      for( int i = 0 ; i < blockNum ; ++i )
+      {
+        Block block;
 
-      Block block;
-
-      stream >> block;
-      group.blocks().push_back( block );
+        stream >> block;
+        group.blocks().push_back( block );
+      }
+      break;
     }
   }
 

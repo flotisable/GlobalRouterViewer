@@ -20,9 +20,11 @@ RoutingGraphInfo::RoutingGraphInfo( Router *routingGraph, QWidget *parent )
   connect(  this , SIGNAL ( routingGraphChanged( Router* ) ) ,
             this , SLOT   ( updateInfo() ) );
 
-  connect(  symmetryCombo , SIGNAL( currentIndexChanged( const QString& ) ) ,
+  connect(  groupCombo    , SIGNAL( currentIndexChanged( const QString& ) ) ,
             this          , SLOT  ( updateSymmetryCombo( const QString& ) ) );
-  connect(  blockCombo    , SIGNAL( currentIndexChanged( const QString& ) ) ,
+  connect(  groupCombo    , SIGNAL( currentIndexChanged( const QString& ) ) ,
+            this          , SLOT  ( updateBlockCombo( const QString& ) ) );
+  connect(  symmetryCombo , SIGNAL( currentIndexChanged( const QString& ) ) ,
             this          , SLOT  ( updateBlockCombo( const QString& ) ) );
   connect(  groupCombo    , SIGNAL( currentIndexChanged( const QString& ) ) ,
             this          , SLOT  ( updateNets( const QString& ) ) );
@@ -58,7 +60,7 @@ void RoutingGraphInfo::updateInfo()
 
   groupCombo->setCurrentIndex( 0 );
 
-  netCombo->addItem( "All" );
+  netCombo->addItem( "None" );
 
   for( const Net &net : routingGraph->nets() )
      netCombo->addItem( net.name() );
@@ -70,13 +72,15 @@ void RoutingGraphInfo::changeMode( const QString &mode )
 {
   if( mode == "Group Mode" )
   {
-    groupModeGroupBox->hide();
-    netModeGroupBox->show();
+    groupModeGroupBox->show();
+    netModeGroupBox->hide();
+    groupCombo->setCurrentIndex( 0 );
   }
   else
   {
-    netModeGroupBox->hide();
-    groupModeGroupBox->show();
+    netModeGroupBox->show();
+    groupModeGroupBox->hide();
+    netCombo->setCurrentIndex( 0 );
   }
 }
 
@@ -105,6 +109,8 @@ void RoutingGraphInfo::updateBlockCombo( const QString &containerName )
   blockCombo->clear();
   blockCombo->addItem( "All" );
 
+  if( containerName.isEmpty() ) return;
+
   if( containerName != "All" )
   {
     if( containerName[0] == 'G' )
@@ -125,17 +131,31 @@ void RoutingGraphInfo::updateBlockCombo( const QString &containerName )
                             [&]( const Symmetry &symmetry )
                               { return ( symmetry.name() == containerName ); } );
 
-         if( it == group.symmetrys().end() )
+         if( it == group.symmetrys().end() ) continue;
 
          for( const Block &block : (*it).blocks() )
             blockCombo->addItem( block.name() );
+         break;
       }
     }
   }
   else
   {
-    for( const Block &block : routingGraph->blocks() )
-       blockCombo->addItem( block.name() );
+    if( groupCombo->currentText() != "All" )
+    {
+      Group &group = *find_if(  routingGraph->groups().begin() ,
+                                routingGraph->groups().end() ,
+                                [&]( const Group &group )
+                                { return ( group.name() == groupCombo->currentText() ); } );
+
+      for( const Block &block : group.blocks() )
+         blockCombo->addItem( block.name() );
+    }
+    else
+    {
+      for( const Block &block : routingGraph->blocks() )
+         blockCombo->addItem( block.name() );
+    }
   }
 
   blockCombo->setCurrentIndex( 0 );
@@ -143,11 +163,11 @@ void RoutingGraphInfo::updateBlockCombo( const QString &containerName )
 
 void RoutingGraphInfo::updateNets( const QString &groupName )
 {
-  if( netGroupBox->layout() ) delete netGroupBox->layout();
+  QVBoxLayout *layout = qobject_cast<QVBoxLayout*>( netGroupBox->layout() );
+
+  if( !layout ) layout =  new QVBoxLayout;
 
   nets.clear();
-
-  QVBoxLayout *layout = new QVBoxLayout;
 
   if( groupName == "All" )
   {
@@ -182,15 +202,19 @@ void RoutingGraphInfo::updateNets( const QString &groupName )
 
 void RoutingGraphInfo::updateBlocks( const QString &netName )
 {
-  if( blockGroupBox->layout() ) delete blockGroupBox;
+  if( netName == "None" ) return;
+
+  QVBoxLayout *layout = qobject_cast<QVBoxLayout*>( blockGroupBox->layout() );
+
+  if( !layout ) layout = new QVBoxLayout;
+
+  for( const auto &pointer : blocks )
+     layout->removeWidget( pointer.data() );
 
   blocks.clear();
 
-  QVBoxLayout *layout = new QVBoxLayout;
-  Net         &net    = *find_if( routingGraph->nets().begin() ,
-                                  routingGraph->nets().end() ,
-                                  [&]( const Net &net )
-                                  { return ( net.name() == netName ); } );
+  Net &net = *find_if(  routingGraph->nets().begin() , routingGraph->nets().end() ,
+                        [&]( const Net &net ) { return ( net.name() == netName ); } );
 
   for( const Pin &pin : net.pins() )
   {

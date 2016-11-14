@@ -6,7 +6,7 @@
 #include "RoutingGraphInfo.h"
 #include "Router.h"
 
-MainWindow::MainWindow()
+MainWindow::MainWindow() : routingGraph( nullptr )
 {
   viewer      = new GlobalRouterViewer( this );
   info        = new RoutingGraphInfo  ( this );
@@ -28,6 +28,11 @@ MainWindow::MainWindow()
   setWindowTitle  ( tr( "Global Routing Viewer" ) );
 }
 
+MainWindow::~MainWindow()
+{
+  if( routingGraph ) delete routingGraph;
+}
+
 bool MainWindow::read( const QString &fileName )
 {
   constexpr auto openMode = QIODevice::ReadOnly | QIODevice::Text;
@@ -43,10 +48,17 @@ bool MainWindow::read( const QString &fileName )
     {
       inFile >> word;
 
-      if( word != "[Graph]" ) inFile >> *routingGraph;
+      if( word != "[Graph]" )
+      {
+        if( routingGraph ) delete routingGraph;
+
+        routingGraph = new Router;
+
+        inFile >> *routingGraph;
+      }
     }
     emit fileRead( routingGraph );
-    emit fileRead( fileName );
+    emit fileRead( QFileInfo( fileName ).fileName() );
 
     return true;
   }

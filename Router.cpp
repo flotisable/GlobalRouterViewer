@@ -8,14 +8,13 @@ QTextStream& operator>>( QTextStream &stream , Router &router )
   {
     word = stream.readLine();
 
-    if( word == "Horizontal Split : " )
+    if( word.contains( "Horizontal Split : " ) )
     {
-      while( true )
+      int splitNum = word.section( ' ' , 3 , 3 ).toInt();
+
+      for( int i = 0 ; i < splitNum ; ++i )
       {
         word = stream.readLine();
-
-        if( word.isEmpty() ) break;
-
         router.hsplit().push_back( word.toDouble() );
       }
       router.setLeft  ( router.hsplit().front () );
@@ -28,14 +27,13 @@ QTextStream& operator>>( QTextStream &stream , Router &router )
   {
     word = stream.readLine();
 
-    if( word == "Vertical Split : " )
+    if( word.contains( "Vertical Split : " ) )
     {
-      while( true )
+      int splitNum = word.section( ' ' , 3 , 3 ).toInt();
+
+      for( int i = 0 ; i < splitNum ; ++i )
       {
         word = stream.readLine();
-
-        if( word.isEmpty() ) break;
-
         router.vsplit().push_back( word.toDouble() );
       }
       router.setBottom( router.vsplit().front () );
@@ -48,9 +46,11 @@ QTextStream& operator>>( QTextStream &stream , Router &router )
   {
     word = stream.readLine();
 
-    if( word == "[ Groups ]" )
+    if( word.contains( "Groups : " ) )
     {
-      while( !stream.atEnd() )
+      int groupNum = word.section( ' ' , 2 , 2 ).toInt();
+
+      for( int i = 0 ; !stream.atEnd() && i < groupNum ; )
       {
         word = stream.readLine();
 
@@ -63,25 +63,10 @@ QTextStream& operator>>( QTextStream &stream , Router &router )
           stream >> group;
 
           router.groups().push_back( group );
+          ++i;
         }
-        else if( word == "[ Blocks ]" ) break;
       }
       break;
-    }
-  }
-
-  if( word == "[ Blocks ]" )
-  {
-    while( !stream.atEnd() )
-    {
-      word = stream.readLine();
-
-      if( word.isEmpty() ) break;
-
-      Block block;
-
-      stream >> block;
-      router.blocks().push_back( block );
     }
   }
 
@@ -89,26 +74,43 @@ QTextStream& operator>>( QTextStream &stream , Router &router )
   {
     word = stream.readLine();
 
-    if( word == "[ Nets ]" )
+    if( word.contains( "Blocks : " ) )
     {
-      while( !stream.atEnd() )
+      int blockNum = word.section( ' ' , 2 , 2 ).toInt();
+
+      for( int i = 0 ; i < blockNum ; ++i )
+      {
+        Block block;
+
+        stream >> block;
+        router.blocks().push_back( block );
+      }
+      break;
+    }
+  }
+
+  while( !stream.atEnd() )
+  {
+    word = stream.readLine();
+
+    if( word.contains( "Nets : " ) )
+    {
+      int netNum = word.section( ' ' , 2 , 2 ).toInt();
+
+      for( int i = 0 ; i < netNum ; ++i )
       {
         Net net;
 
         stream >> net;
 
-        if( !net.name().isEmpty() )
+        for( Pin &pin : net.pins() )
         {
-          for( Pin &pin : net.pins() )
-          {
-             Block *block = pin.connect();
+           Block *block = pin.connect();
 
-             pin.setConnect( router.getBlock( block->name() ) );
-             delete block;
-          }
-
-          router.nets().push_back( net );
+           pin.setConnect( router.getBlock( block->name() ) );
+           delete block;
         }
+        router.nets().push_back( net );
       }
     }
   }

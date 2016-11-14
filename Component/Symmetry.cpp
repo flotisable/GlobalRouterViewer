@@ -6,22 +6,22 @@ QTextStream &operator>>( QTextStream &stream, Symmetry &symmetry )
 
   while( !stream.atEnd() )
   {
-    if( word == "Blocks :" )
+    word = stream.readLine();
+
+    if( word.contains( "Blocks : " ) )
     {
-      while( !stream.atEnd() )
+      int blockNum = word.section( ' ' , 2 , 2 ).toInt();
+
+      for( int i = 0 ; i < blockNum ; ++i )
       {
-        word = stream.readLine();
-
-        if( word.isEmpty() ) break;
-
         Block block;
 
         stream >> block;
         symmetry.blocks().push_back( block );
       }
+      break;
     }
   }
-
   return stream;
 }
 

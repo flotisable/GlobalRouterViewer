@@ -1,6 +1,6 @@
 #include "Block.h"
 
-QTextStream &operator>>(QTextStream &stream, Block &block)
+QTextStream &operator>>( QTextStream &stream, Block &block )
 {
   QString name;
   QString buffer;

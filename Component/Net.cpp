@@ -13,8 +13,8 @@ QTextStream &operator>>( QTextStream &stream, Net &net )
 
   if( !word.isEmpty() )
   {
-    net.setName( word.section( ' ' , 0 , 0 ) );
-    net.setCurrentDensity( word.section( ' ' , 1 , 1 ).toDouble() );
+    net.setName           ( word.section( ' ' , 0 , 0 ) );
+    net.setCurrentDensity ( word.section( ' ' , 1 , 1 ).toDouble() );
   }
 
   word = stream.readLine();
@@ -44,6 +44,7 @@ QTextStream &operator>>( QTextStream &stream, Net &net )
     net.path().push_back( QPoint( pointWord.section( sep , 1 , 1 ).toInt() ,
                                   pointWord.section( sep , 3 , 3 ).toInt() ) );
   }
+  stream.readLine();
 
   return stream;
 }
