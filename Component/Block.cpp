@@ -14,7 +14,7 @@ QTextStream &operator>>( QTextStream &stream, Block &block )
   block.setName   ( name );
   block.setWidth  ( width );
   block.setHeight ( height );
-  block.moveBottomLeft( QPointF( lbX , lbY ) );
+  block.moveTopLeft( QPointF( lbX , lbY ) );
 
   return stream;
 }

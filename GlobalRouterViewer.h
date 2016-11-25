@@ -3,18 +3,28 @@
 
 #include <QGraphicsView>
 
+class Router;
+
 class GlobalRouterViewer : public QGraphicsView
 {
-    Q_OBJECT
+  Q_OBJECT
 
-    public:
+  public:
 
-        GlobalRouterViewer( QWidget *parent = nullptr );
-        GlobalRouterViewer( QGraphicsScene *scene , QWidget *parent = nullptr );
+    GlobalRouterViewer( QWidget *parent = nullptr );
+    GlobalRouterViewer( QGraphicsScene *scene , QWidget *parent = nullptr );
 
-    private:
+  public slots:
 
-        QGraphicsScene  *scene;
+    void updateScene( Router *routingGraph );
+
+  protected:
+
+    void keyPressEvent( QKeyEvent *event ) Q_DECL_OVERRIDE;
+
+  private:
+
+    QGraphicsScene  *scene;
 };
 
 #endif // GLOBALROUTERVIEWER_H

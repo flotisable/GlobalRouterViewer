@@ -23,6 +23,8 @@ MainWindow::MainWindow() : routingGraph( nullptr )
             info        , SLOT  ( setRoutingGraph( Router* ) ) );
   connect(  this        , SIGNAL( fileRead( const QString& ) ) ,
             info        , SLOT  ( setSourceFile( const QString& ) ) );
+  connect(  this        , SIGNAL( fileRead( Router* ) ) ,
+            viewer      , SLOT  ( updateScene( Router* ) ) );
 
   setCentralWidget( viewer );
   setWindowTitle  ( tr( "Global Routing Viewer" ) );
