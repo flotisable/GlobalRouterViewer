@@ -2,22 +2,27 @@ QT += widgets
 
 SOURCES += \
     main.cpp \
-    GlobalRouterViewer.cpp \
     Component/Group.cpp \
-    MainWindow.cpp \
-    RoutingGraphInfo.cpp \
-    Router.cpp \
     Component/Symmetry.cpp \
     Component/Block.cpp \
-    Component/Net.cpp
+    Component/Net.cpp \
+    Component/Pin.cpp \
+    Component/Path.cpp \
+    RoutingGraph/Router.cpp \
+    RoutingGraph/RoutingRegion.cpp \
+    Widgets/GlobalRouterViewer.cpp \
+    Widgets/MainWindow.cpp \
+    Widgets/RoutingGraphInfo.cpp
 
 HEADERS += \
-    GlobalRouterViewer.h \
     Component/Block.h \
     Component/Group.h \
     Component/Net.h \
     Component/Pin.h \
     Component/Symmetry.h \
-    MainWindow.h \
-    RoutingGraphInfo.h \
-    Router.h
+    Component/Path.h \
+    RoutingGraph/Router.h \
+    RoutingGraph/RoutingRegion.h \
+    Widgets/GlobalRouterViewer.h \
+    Widgets/MainWindow.h \
+    Widgets/RoutingGraphInfo.h

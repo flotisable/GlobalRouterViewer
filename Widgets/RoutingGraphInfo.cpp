@@ -4,7 +4,7 @@
 #include <algorithm>
 using namespace std;
 
-#include "Router.h"
+#include "../RoutingGraph/Router.h"
 
 RoutingGraphInfo::RoutingGraphInfo( QWidget *parent ) : RoutingGraphInfo( nullptr , parent )
 {

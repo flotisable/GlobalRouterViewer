@@ -4,6 +4,8 @@ QTextStream& operator>>( QTextStream &stream , Router &router )
 {
   QString word;
 
+  router.setName( "ALL" );
+
   while( !stream.atEnd() )
   {
     word = stream.readLine();
@@ -110,7 +112,16 @@ QTextStream& operator>>( QTextStream &stream , Router &router )
            pin.setConnect( router.getBlock( block->name() ) );
            delete block;
         }
+        for( Path &path : net.paths() )
+        {
+           RoutingRegion *region = path.belongRegion();
+
+           path.setBelongRegion( router.getRegion( region->name() ) );
+           delete region;
+        }
         router.nets().push_back( net );
+
+        stream.readLine();
       }
     }
   }
@@ -126,7 +137,15 @@ Block* Router::getBlock( const QString & name )
 
     if( block ) return block;
   }
-  for( Block &block : blocks() )
-     if( block.name() == name ) return &block;
+  return RoutingRegion::getBlock( name );
+}
+
+RoutingRegion* Router::getRegion( const QString &name )
+{
+  if( this->name() == name ) return this;
+
+  for( Group &group : groups() )
+     if( group.name() == name ) return &group;
+
   return nullptr;
 }

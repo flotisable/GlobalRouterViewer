@@ -5,59 +5,6 @@ using namespace std;
 
 #include "Pin.h"
 
-QVector<QPoint> Group::connectedPin( Net &net )
-{
-  QVector<QPoint> pins;
-
-  for( const Pin &pin : net.pins() )
-  {
-     if(  ( mHsplit.front() <= pin.x() && pin.x() <= mHsplit.back() ) &&
-          ( mVsplit.front() <= pin.y() && pin.y() <= mVsplit.back() ) )
-     {
-       int x;
-       int y;
-
-       for( x = 0 ; x < mHsplit.size() ; ++x )
-          if( mHsplit[x] >= pin.x() )
-          {
-            --x;
-            break;
-          }
-       for( y = 0 ; y < mVsplit.size() ; ++y )
-          if( mVsplit[y] >= pin.y() )
-          {
-            --y;
-            break;
-          }
-
-       pins.push_back( QPoint( x , y ) );
-     }
-  }
-  return pins;
-}
-
-Block* Group::getBlock( const QString &name )
-{
-  for( Symmetry &symmetry : symmetrys() )
-  {
-     Block *block = symmetry.getBlock( name );
-
-     if( block ) return block;
-  }
-  for( Block &block : blocks() )
-     if( block.name() == name ) return &block;
-  return nullptr;
-}
-
-bool Group::netConnected( Net &net )
-{
-  for( const Pin &pin : net.pins() )
-     if(  ( mHsplit.front() <= pin.x() && pin.x() <= mHsplit.back() ) &&
-          ( mVsplit.front() <= pin.y() && pin.y() <= mVsplit.back() ) )
-       return true;
-  return false;
-}
-
 QTextStream &operator>>(QTextStream &stream, Group &group)
 {
   QString word;
@@ -148,4 +95,16 @@ QTextStream &operator>>(QTextStream &stream, Group &group)
   }
 
   return stream;
+}
+
+
+Block* Group::getBlock( const QString &name )
+{
+  for( Symmetry &symmetry : symmetrys() )
+  {
+     Block *block = symmetry.getBlock( name );
+
+     if( block ) return block;
+  }
+  return RoutingRegion::getBlock( name );
 }

@@ -2,7 +2,7 @@
 
 #include <QtWidgets>
 
-#include "Router.h"
+#include "../RoutingGraph/Router.h"
 
 GlobalRouterViewer::GlobalRouterViewer( QWidget *parent ) : QGraphicsView( parent )
 {
@@ -74,13 +74,13 @@ void GlobalRouterViewer::updateScene( Router *routingGraph )
   }
   pen.setColor( Qt::black );
 
-  for( Net &net : routingGraph->nets() )
+  /*for( Net &net : routingGraph->nets() )
   {
-     for( int i = 0 ; i < net.path().size() - 1 ; ++i )
+     for( int i = 0 ; i < net.paths().size() - 1 ; ++i )
      {
 
      }
-  }
+  }*/
   fitInView( scene->sceneRect() );
 }
 

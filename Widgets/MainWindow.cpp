@@ -4,7 +4,7 @@
 
 #include "GlobalRouterViewer.h"
 #include "RoutingGraphInfo.h"
-#include "Router.h"
+#include "../RoutingGraph/Router.h"
 
 MainWindow::MainWindow() : routingGraph( nullptr )
 {

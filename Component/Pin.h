@@ -2,6 +2,7 @@
 #define PIN_H
 
 #include <QPointF>
+#include <QTextStream>
 
 class Block;
 
@@ -21,6 +22,8 @@ class Pin : public QPointF
 
     Block *mConnect;
 };
+
+QTextStream& operator>>( QTextStream &stream , Pin &pin );
 
 inline Pin::Pin( Block* const connect ) : mConnect( connect ) {}
 inline Pin::Pin( Block* const connect , const QPoint &p )
