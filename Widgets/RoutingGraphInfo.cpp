@@ -6,7 +6,8 @@ using namespace std;
 
 #include "../RoutingGraph/Router.h"
 
-RoutingGraphInfo::RoutingGraphInfo( QWidget *parent ) : RoutingGraphInfo( nullptr , parent )
+RoutingGraphInfo::RoutingGraphInfo( QWidget *parent )
+  : RoutingGraphInfo( nullptr , parent )
 {
 }
 
@@ -45,17 +46,38 @@ void RoutingGraphInfo::setSourceFile( const QString &fileName )
 
 void RoutingGraphInfo::updateInfo()
 {
+  QVBoxLayout *layout;
+
   groupCombo->clear();
   symmetryCombo->clear();
   blockCombo->clear();
   netCombo->clear();
 
-  nets.clear();
-  blocks.clear();
+  // set nets
+  layout = qobject_cast<QVBoxLayout*>( netGroupBox->layout() );
+
+  for( const Net &net : routingGraph->nets() )
+     layout->addWidget( new QCheckBox( net.name() ) );
+  // end set nets
+  // set blocks
+  layout = qobject_cast<QVBoxLayout*>( blockGroupBox->layout() );
+
+  for( Group &group : routingGraph->groups() )
+  {
+     for( Symmetry &symmetry : group.symmetrys() )
+        for( const Block &block : symmetry.blocks() )
+           layout->addWidget( new QCheckBox( block.name() ) );
+
+     for( const Block &block : group.blocks() )
+        layout->addWidget( new QCheckBox( block.name() ) );
+  }
+  for( const Block &block : routingGraph->blocks() )
+     layout->addWidget( new QCheckBox( block.name() ) );
+  // end set blocks
 
   groupCombo->addItem( "All" );
 
-  for( const Group &group : routingGraph->groups() )
+  for( Group &group : routingGraph->groups() )
      groupCombo->addItem( group.name() );
 
   groupCombo->setCurrentIndex( 0 );
@@ -143,10 +165,10 @@ void RoutingGraphInfo::updateBlockCombo( const QString &containerName )
   {
     if( groupCombo->currentText() != "All" )
     {
-      Group &group = *find_if(  routingGraph->groups().begin() ,
-                                routingGraph->groups().end() ,
-                                [&]( const Group &group )
-                                { return ( group.name() == groupCombo->currentText() ); } );
+      Group &group =
+        *find_if( routingGraph->groups().begin() , routingGraph->groups().end() ,
+                  [&]( const Group &group )
+                  { return ( group.name() == groupCombo->currentText() ); } );
 
       for( const Block &block : group.blocks() )
          blockCombo->addItem( block.name() );
@@ -165,19 +187,13 @@ void RoutingGraphInfo::updateNets( const QString &groupName )
 {
   QVBoxLayout *layout = qobject_cast<QVBoxLayout*>( netGroupBox->layout() );
 
-  if( !layout ) layout =  new QVBoxLayout;
-
-  nets.clear();
+  for( int i = 0 ; i < layout->count() ; ++i )
+     layout->itemAt( i )->widget()->hide();
 
   if( groupName == "All" )
   {
-    for( const Net &net : routingGraph->nets() )
-    {
-       QSharedPointer<QCheckBox> pointer( new QCheckBox( net.name() ) );
-
-       nets.push_back( pointer );
-       layout->addWidget( pointer.data() );
-    }
+    for( int i = 0 ; i < layout->count() ; ++i )
+       layout->itemAt( i )->widget()->show();
   }
   else
   {
@@ -190,40 +206,47 @@ void RoutingGraphInfo::updateNets( const QString &groupName )
     {
        if( group.netConnected( net ) )
        {
-         QSharedPointer<QCheckBox> pointer( new QCheckBox( net.name() ) );
+         for( int i = 0 ; i < layout->count() ; ++i )
+         {
+            QCheckBox *checkBox =
+              qobject_cast<QCheckBox*>( layout->itemAt( i )->widget() );
 
-         nets.push_back( pointer );
-         layout->addWidget( pointer.data() );
+            if( checkBox->text() == net.name() )
+            {
+              checkBox->show();
+              break;
+            }
+         }
        }
     }
   }
-  netGroupBox->setLayout( layout );
 }
 
 void RoutingGraphInfo::updateBlocks( const QString &netName )
 {
-  if( netName == "None" ) return;
-
   QVBoxLayout *layout = qobject_cast<QVBoxLayout*>( blockGroupBox->layout() );
 
-  if( !layout ) layout = new QVBoxLayout;
+  for( int i = 0 ; i < layout->count() ; ++i )
+     layout->itemAt( i )->widget()->hide();
 
-  for( const auto &pointer : blocks )
-     layout->removeWidget( pointer.data() );
+  auto it = find_if(  routingGraph->nets().begin() , routingGraph->nets().end() ,
+                      [&]( const Net &net ) { return ( net.name() == netName ); } );
 
-  blocks.clear();
+  if( it == routingGraph->nets().end() )  return;
 
-  Net &net = *find_if(  routingGraph->nets().begin() , routingGraph->nets().end() ,
-                        [&]( const Net &net ) { return ( net.name() == netName ); } );
+  Net &net = *it;
 
   for( const Pin &pin : net.pins() )
-  {
-     QSharedPointer<QCheckBox> pointer( new QCheckBox( pin.connect()->name() ) );
+     for( int i = 0 ; i < layout->count() ; ++i )
+     {
+        QCheckBox *checkBox = qobject_cast<QCheckBox*>( layout->itemAt( i )->widget() );
 
-     blocks.push_back( pointer );
-     layout->addWidget( pointer.data() );
-  }
-  blockGroupBox->setLayout( layout );
+        if( checkBox->text() == pin.connect()->name() )
+        {
+          checkBox->show();
+          break;
+        }
+     }
 }
 
 void RoutingGraphInfo::setupWidgets()
@@ -266,6 +289,8 @@ QGroupBox* RoutingGraphInfo::setupGroupModeWidgets()
   blockCombo    = new QComboBox;
   netGroupBox   = new QGroupBox;
 
+  netGroupBox->setLayout( new QVBoxLayout );
+
   layout->addWidget( groupCombo     );
   layout->addWidget( symmetryCombo  );
   layout->addWidget( blockCombo     );
@@ -283,6 +308,8 @@ QGroupBox* RoutingGraphInfo::setupNetModeWidgets()
 
   netCombo      = new QComboBox;
   blockGroupBox = new QGroupBox;
+
+  blockGroupBox->setLayout( new QVBoxLayout );
 
   layout->addWidget( netCombo       );
   layout->addWidget( blockGroupBox  );

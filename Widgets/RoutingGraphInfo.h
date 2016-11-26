@@ -22,6 +22,8 @@ class RoutingGraphInfo : public QWidget
   signals:
 
     void routingGraphChanged( Router *routingGraph );
+    void netCheckToggled    ( const QString &netName );
+    void blockCheckToggled  ( const QString &blockName );
 
   public slots:
 
@@ -48,17 +50,13 @@ class RoutingGraphInfo : public QWidget
     QGroupBox *groupModeGroupBox;
     QGroupBox *netModeGroupBox;
 
-    QComboBox         *groupCombo;
-    QComboBox         *symmetryCombo;
-    QComboBox         *blockCombo;
-    QGroupBox         *netGroupBox;
-
-    QList<QSharedPointer<QCheckBox>>  nets;
+    QComboBox *groupCombo;
+    QComboBox *symmetryCombo;
+    QComboBox *blockCombo;
+    QGroupBox *netGroupBox;
 
     QComboBox *netCombo;
     QGroupBox *blockGroupBox;
-
-    QList<QSharedPointer<QCheckBox>>  blocks;
 };
 
 #endif // ROUTINGGRAPHINFO_H
