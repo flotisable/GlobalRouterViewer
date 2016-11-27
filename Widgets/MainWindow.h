@@ -30,6 +30,7 @@ class MainWindow : public QMainWindow
 
     void setupMenuBar ();
     void setupLeftDock();
+    void setupConnect ();
 
     GlobalRouterViewer  *viewer;
     RoutingGraphInfo    *info;

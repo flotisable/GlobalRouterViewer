@@ -16,15 +16,7 @@ MainWindow::MainWindow() : routingGraph( nullptr )
 
   setupMenuBar  ();
   setupLeftDock ();
-
-  connect(  fileDialog  , SIGNAL( fileSelected( QString ) ) ,
-            this        , SLOT  ( read( QString ) ) );
-  connect(  this        , SIGNAL( fileRead( Router* ) ) ,
-            info        , SLOT  ( setRoutingGraph( Router* ) ) );
-  connect(  this        , SIGNAL( fileRead( const QString& ) ) ,
-            info        , SLOT  ( setSourceFile( const QString& ) ) );
-  connect(  this        , SIGNAL( fileRead( Router* ) ) ,
-            viewer      , SLOT  ( updateScene( Router* ) ) );
+  setupConnect  ();
 
   setCentralWidget( viewer );
   setWindowTitle  ( tr( "Global Routing Viewer" ) );
@@ -90,4 +82,29 @@ void MainWindow::setupLeftDock()
 
   toggleLeftDockAct = dockWidget->toggleViewAction();
   windowMenu->addAction( toggleLeftDockAct );
+}
+
+void MainWindow::setupConnect()
+{
+  connect(  fileDialog  , SIGNAL( fileSelected( QString ) ) ,
+            this        , SLOT  ( read( QString ) ) );
+  connect(  this        , SIGNAL( fileRead( Router* ) ) ,
+            viewer      , SLOT  ( updateScene( Router* ) ) );
+  connect(  this        , SIGNAL( fileRead( Router* ) ) ,
+            viewer      , SLOT  ( setRoutingGraph( Router* ) ) );
+  connect(  this        , SIGNAL( fileRead( Router* ) ) ,
+            info        , SLOT  ( setRoutingGraph( Router* ) ) );
+  connect(  this        , SIGNAL( fileRead( const QString& ) ) ,
+            info        , SLOT  ( setSourceFile( const QString& ) ) );
+
+  connect(  info    , SIGNAL( regionSelected( const QString& ) ) ,
+            viewer  , SLOT  ( selectRegion( const QString& ) ) );
+  connect(  info    , SIGNAL( blockSelected( const QString& ) ) ,
+            viewer  , SLOT  ( selectBlock( const QString& ) ) );
+  connect(  info    , SIGNAL( netCheckToggled( const QString& ) ) ,
+            viewer  , SLOT  ( updateNet( const QString& ) ) );
+  connect(  info    , SIGNAL( netSelected( const QString& ) ) ,
+            viewer  , SLOT  ( selectNet( const QString& ) ) );
+  connect(  info    , SIGNAL( blockCheckToggled( const QString& ) ) ,
+            viewer  , SLOT  ( updateBlock( const QString& ) ) );
 }

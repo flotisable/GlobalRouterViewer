@@ -2,8 +2,10 @@
 #define GLOBALROUTERVIEWER_H
 
 #include <QGraphicsView>
+#include <QMap>
 
 class Router;
+class RoutingRegion;
 
 class GlobalRouterViewer : public QGraphicsView
 {
@@ -16,7 +18,13 @@ class GlobalRouterViewer : public QGraphicsView
 
   public slots:
 
-    void updateScene( Router *routingGraph );
+    void setRoutingGraph( Router *routingGraph );
+    void updateScene    ( Router *routingGraph );
+    void selectRegion   ( const QString &regionName );
+    void selectBlock    ( const QString &blockName );
+    void updateNet      ( const QString &netName );
+    void selectNet      ( const QString &netName );
+    void updateBlock    ( const QString &blockName );
 
   protected:
 
@@ -24,7 +32,16 @@ class GlobalRouterViewer : public QGraphicsView
 
   private:
 
-    QGraphicsScene  *scene;
+    static constexpr double unit = 10;
+
+    QGraphicsScene *scene;
+
+    Router *routingGraph = nullptr;
+
+    RoutingRegion                           *selectedRegion = nullptr;
+    QMap<QString,QList<QGraphicsLineItem*>> nets;
+    QMap<QString,QGraphicsRectItem*>        blocks;
+
 };
 
 #endif // GLOBALROUTERVIEWER_H

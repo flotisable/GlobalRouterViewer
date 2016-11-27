@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QList>
 #include <QCheckBox>
+#include <QSignalMapper>
 
 class QComboBox;
 class QGroupBox;
@@ -22,8 +23,11 @@ class RoutingGraphInfo : public QWidget
   signals:
 
     void routingGraphChanged( Router *routingGraph );
+    void regionSelected     ( const QString &regionName );
     void netCheckToggled    ( const QString &netName );
+    void blockSelected      ( const QString &blockName );
     void blockCheckToggled  ( const QString &blockName );
+    void netSelected        ( const QString &netName );
 
   public slots:
 
@@ -39,6 +43,7 @@ class RoutingGraphInfo : public QWidget
   private:
 
     void        setupWidgets          ();
+    void        setupConnect          ();
     QGroupBox*  setupGroupModeWidgets ();
     QGroupBox*  setupNetModeWidgets   ();
 
@@ -50,13 +55,15 @@ class RoutingGraphInfo : public QWidget
     QGroupBox *groupModeGroupBox;
     QGroupBox *netModeGroupBox;
 
-    QComboBox *groupCombo;
-    QComboBox *symmetryCombo;
-    QComboBox *blockCombo;
-    QGroupBox *netGroupBox;
+    QSignalMapper *netMapper;
+    QComboBox     *groupCombo;
+    QComboBox     *symmetryCombo;
+    QComboBox     *blockCombo;
+    QGroupBox     *netGroupBox;
 
-    QComboBox *netCombo;
-    QGroupBox *blockGroupBox;
+    QSignalMapper *blockMapper;
+    QComboBox     *netCombo;
+    QGroupBox     *blockGroupBox;
 };
 
 #endif // ROUTINGGRAPHINFO_H
