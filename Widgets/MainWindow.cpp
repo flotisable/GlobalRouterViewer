@@ -89,8 +89,6 @@ void MainWindow::setupConnect()
   connect(  fileDialog  , SIGNAL( fileSelected( QString ) ) ,
             this        , SLOT  ( read( QString ) ) );
   connect(  this        , SIGNAL( fileRead( Router* ) ) ,
-            viewer      , SLOT  ( updateScene( Router* ) ) );
-  connect(  this        , SIGNAL( fileRead( Router* ) ) ,
             viewer      , SLOT  ( setRoutingGraph( Router* ) ) );
   connect(  this        , SIGNAL( fileRead( Router* ) ) ,
             info        , SLOT  ( setRoutingGraph( Router* ) ) );

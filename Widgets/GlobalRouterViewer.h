@@ -19,7 +19,6 @@ class GlobalRouterViewer : public QGraphicsView
   public slots:
 
     void setRoutingGraph( Router *routingGraph );
-    void updateScene    ( Router *routingGraph );
     void selectRegion   ( const QString &regionName );
     void selectBlock    ( const QString &blockName );
     void updateNet      ( const QString &netName );
@@ -38,7 +37,11 @@ class GlobalRouterViewer : public QGraphicsView
 
     Router *routingGraph = nullptr;
 
-    RoutingRegion                           *selectedRegion = nullptr;
+    RoutingRegion             *selectedRegion = nullptr;
+    QList<QGraphicsLineItem*> splits;
+    QList<QGraphicsRectItem*> regionBlocks;
+    QList<QGraphicsRectItem*> symmetryBlocks;
+
     QMap<QString,QList<QGraphicsLineItem*>> nets;
     QMap<QString,QGraphicsRectItem*>        blocks;
 

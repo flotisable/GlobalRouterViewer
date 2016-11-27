@@ -23,69 +23,48 @@ GlobalRouterViewer::GlobalRouterViewer( QGraphicsScene *scene, QWidget *parent )
 void GlobalRouterViewer::setRoutingGraph( Router *routingGraph )
 {
   this->routingGraph = routingGraph;
-}
-
-void GlobalRouterViewer::updateScene( Router *routingGraph )
-{
-  QPen pen;
-
-  pen.setWidth( 1 );
 
   for( double x : routingGraph->hsplit() )
      scene->addLine(  x * unit , routingGraph->vsplit().front() * -unit ,
-                      x * unit , routingGraph->vsplit().back () * -unit , pen );
+                      x * unit , routingGraph->vsplit().back () * -unit );
 
   for( double y : routingGraph->vsplit() )
      scene->addLine(  routingGraph->hsplit().front() * unit , y * -unit ,
-                      routingGraph->hsplit().back () * unit , y * -unit , pen );
-
-  /*for( Group &group : routingGraph->groups() )
-  {
-     pen.setColor( Qt::black );
-     for( double x : group.hsplit() )
-        scene->addLine( x * unit , group.vsplit().front() * -unit ,
-                        x * unit , group.vsplit().back () * -unit , pen );
-
-     for( double y : group.vsplit() )
-        scene->addLine( group.hsplit().front() * unit , y * -unit ,
-                        group.hsplit().back () * unit , y * -unit , pen );
-
-     pen.setColor( Qt::blue );
-     for( Symmetry & symmetry : group.symmetrys() )
-     {
-
-        for( Block &block : symmetry.blocks() )
-        {
-           scene->addRect(  block.left() * unit , block.bottom() * -unit ,
-                            block.width() * unit , block.height() * unit , pen );
-        }
-     }
-     for( Block &block : group.blocks() )
-     {
-        scene->addRect( block.left() * unit , block.bottom() * -unit ,
-                        block.width() * unit , block.height() * unit , pen );
-     }
-     pen.setColor( Qt::red );
-     scene->addRect(  group.left() * unit , group.bottom() * -unit ,
-                      group.width() * unit , group.height() * unit , pen );
-  }*/
-
-  /*pen.setColor( Qt::blue );
-  for( Block &block : routingGraph->blocks() )
-  {
-     scene->addRect(  block.left() * unit , block.bottom() * -unit ,
-                      block.width() * unit , block.height() * unit , pen );
-  }
-  pen.setColor( Qt::black );*/
+                      routingGraph->hsplit().back () * unit , y * -unit );
 
   fitInView( scene->sceneRect() );
 }
 
 void GlobalRouterViewer::selectRegion( const QString &regionName )
 {
-  if( !routingGraph ) return;
   selectedRegion = routingGraph->getRegion( regionName );
   Q_ASSERT( selectedRegion );
+
+  for( QGraphicsRectItem *item : regionBlocks )
+     scene->removeItem( item );
+
+  regionBlocks.clear();
+
+  for( const Block &block : selectedRegion->blocks() )
+     regionBlocks.push_back(
+       scene->addRect(  block.left() * unit , block.bottom() * -unit ,
+                        block.width() * unit , block.height() * unit ,
+                        QPen( Qt::blue ) ) );
+
+  if( regionName == "ALL" )
+  {
+    for( const Group &group : static_cast<Router*>( selectedRegion )->groups() )
+       regionBlocks.push_back(
+         scene->addRect(  group.left() * unit , group.bottom() * -unit ,
+                          group.width() * unit , group.height() * unit ,
+                          QPen( Qt::red ) ) );
+  }
+  else
+  {
+
+
+    for( double x : selectedRegion->hsplit() )
+  }
 }
 
 void GlobalRouterViewer::selectBlock( const QString &blockName )
@@ -99,7 +78,6 @@ void GlobalRouterViewer::updateNet( const QString &netName )
 
   if( nets.find( netName ) == nets.end() )
   {
-    Q_ASSERT( routingGraph );
     QVector<Net> &nets = routingGraph->nets();
 
     auto it = std::find_if( nets.begin() , nets.end() ,
