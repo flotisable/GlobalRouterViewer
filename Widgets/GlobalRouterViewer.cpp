@@ -40,16 +40,17 @@ void GlobalRouterViewer::selectRegion( const QString &regionName )
   selectedRegion = routingGraph->getRegion( regionName );
   Q_ASSERT( selectedRegion );
 
+  // clear previous blocks and splits
   for( QGraphicsRectItem *item : regionBlocks )
      scene->removeItem( item );
 
   regionBlocks.clear();
 
-  for( const Block &block : selectedRegion->blocks() )
-     regionBlocks.push_back(
-       scene->addRect(  block.left() * unit , block.bottom() * -unit ,
-                        block.width() * unit , block.height() * unit ,
-                        QPen( Qt::blue ) ) );
+  for( QGraphicsLineItem *item : splits )
+     scene->removeItem( item );
+
+  splits.clear();
+  // end clear previous blocks and splits
 
   if( regionName == "ALL" )
   {
@@ -57,14 +58,42 @@ void GlobalRouterViewer::selectRegion( const QString &regionName )
        regionBlocks.push_back(
          scene->addRect(  group.left() * unit , group.bottom() * -unit ,
                           group.width() * unit , group.height() * unit ,
-                          QPen( Qt::red ) ) );
+                          QPen( Qt::darkRed ) ) );
   }
   else
   {
-
-
+    // setup splits
     for( double x : selectedRegion->hsplit() )
+       splits.push_back(
+         scene->addLine( x * unit , selectedRegion->vsplit().front() * -unit ,
+                         x * unit , selectedRegion->vsplit().back() * -unit ) );
+
+    for( double y : selectedRegion->vsplit() )
+       splits.push_back(
+         scene->addLine( selectedRegion->hsplit().front() * unit , y * -unit ,
+                         selectedRegion->hsplit().back() * unit , y * -unit ) );
+    // end setup splits
+
+    for( Symmetry &symmetry : static_cast<Group*>( selectedRegion )->symmetrys() )
+       for( const Block &block : symmetry.blocks() )
+          regionBlocks.push_back(
+            scene->addRect( block.left() * unit , block.bottom() * -unit ,
+                            block.width() * unit , block.height() * unit ,
+                            QPen( Qt::blue ) ) );
   }
+
+  // setup blocks
+  for( const Block &block : selectedRegion->blocks() )
+     regionBlocks.push_back(
+       scene->addRect(  block.left() * unit , block.bottom() * -unit ,
+                        block.width() * unit , block.height() * unit ,
+                        QPen( Qt::blue ) ) );
+
+  regionBlocks.push_back(
+    scene->addRect( selectedRegion->left() * unit , selectedRegion->bottom() * -unit ,
+                    selectedRegion->width() * unit , selectedRegion->height() * unit ,
+                    QPen( Qt::red ) ) );
+  // end setup blocks
 }
 
 void GlobalRouterViewer::selectBlock( const QString &blockName )
