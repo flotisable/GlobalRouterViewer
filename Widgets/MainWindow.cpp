@@ -15,6 +15,7 @@ MainWindow::MainWindow() : routingGraph( nullptr )
   fileDialog->setFileMode( QFileDialog::ExistingFile );
 
   setupMenuBar  ();
+  setupToolBar  ();
   setupLeftDock ();
   setupConnect  ();
 
@@ -70,6 +71,18 @@ void MainWindow::setupMenuBar()
   connect( quitAct , SIGNAL( triggered( bool ) ) , this       , SLOT( close () ) );
 
   windowMenu = menuBar()->addMenu( tr( "Windows" ) );
+
+  viewMenu = menuBar()->addMenu( tr( "View" ) );
+
+  fitToAllAct     = viewMenu->addAction( tr( "fit to all" ) );
+  fitToRegionAct  = viewMenu->addAction( tr( "fit to region" ) );
+
+  connect( fitToAllAct    , SIGNAL( triggered( bool ) ) , viewer , SLOT( fitToAll() ) );
+  connect( fitToRegionAct , SIGNAL( triggered( bool ) ) , viewer , SLOT( fitToRegion() ) );
+}
+
+void MainWindow::setupToolBar()
+{
 }
 
 void MainWindow::setupLeftDock()

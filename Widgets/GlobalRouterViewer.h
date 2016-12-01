@@ -24,6 +24,8 @@ class GlobalRouterViewer : public QGraphicsView
     void updateNet      ( const QString &netName );
     void selectNet      ( const QString &netName );
     void updateBlock    ( const QString &blockName );
+    void fitToAll       ();
+    void fitToRegion    ();
 
   protected:
 

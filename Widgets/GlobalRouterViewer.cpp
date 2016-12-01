@@ -58,7 +58,8 @@ void GlobalRouterViewer::selectRegion( const QString &regionName )
        regionBlocks.push_back(
          scene->addRect(  group.left() * unit , group.bottom() * -unit ,
                           group.width() * unit , group.height() * unit ,
-                          QPen( Qt::darkRed ) ) );
+                          QPen( Qt::darkRed ) ,
+                          QBrush( Qt::darkRed , Qt::Dense6Pattern ) ) );
   }
   else
   {
@@ -79,7 +80,7 @@ void GlobalRouterViewer::selectRegion( const QString &regionName )
           regionBlocks.push_back(
             scene->addRect( block.left() * unit , block.bottom() * -unit ,
                             block.width() * unit , block.height() * unit ,
-                            QPen( Qt::blue ) ) );
+                            QPen( Qt::blue ) , QBrush( Qt::blue , Qt::Dense6Pattern ) ) );
   }
 
   // setup blocks
@@ -87,7 +88,7 @@ void GlobalRouterViewer::selectRegion( const QString &regionName )
      regionBlocks.push_back(
        scene->addRect(  block.left() * unit , block.bottom() * -unit ,
                         block.width() * unit , block.height() * unit ,
-                        QPen( Qt::blue ) ) );
+                        QPen( Qt::blue ) , QBrush( Qt::blue , Qt::Dense6Pattern ) ) );
 
   regionBlocks.push_back(
     scene->addRect( selectedRegion->left() * unit , selectedRegion->bottom() * -unit ,
@@ -157,6 +158,19 @@ void GlobalRouterViewer::selectNet( const QString &netName )
 void GlobalRouterViewer::updateBlock( const QString &blockName )
 {
   Q_UNUSED( blockName )
+}
+
+void GlobalRouterViewer::fitToAll()
+{
+  QRectF rect = scene->sceneRect();
+
+  fitInView( rect );
+}
+
+void GlobalRouterViewer::fitToRegion()
+{
+  fitInView(  selectedRegion->left() * unit , selectedRegion->bottom() * -unit ,
+              selectedRegion->width() * unit , selectedRegion->height() * unit );
 }
 
 void GlobalRouterViewer::keyPressEvent( QKeyEvent *event )

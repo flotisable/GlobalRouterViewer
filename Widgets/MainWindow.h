@@ -29,6 +29,7 @@ class MainWindow : public QMainWindow
   private:
 
     void setupMenuBar ();
+    void setupToolBar ();
     void setupLeftDock();
     void setupConnect ();
 
@@ -40,11 +41,17 @@ class MainWindow : public QMainWindow
 
     QMenu *fileMenu;
     QMenu *windowMenu;
+    QMenu *viewMenu;
+
+    QToolBar *viewToolBar;
 
     QAction *openAct;
     QAction *quitAct;
 
     QAction *toggleLeftDockAct;
+
+    QAction *fitToAllAct;
+    QAction *fitToRegionAct;
 };
 
 #endif // MAINWINDOW_H
