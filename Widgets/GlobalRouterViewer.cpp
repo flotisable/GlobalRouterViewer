@@ -63,6 +63,12 @@ void GlobalRouterViewer::selectRegion( const QString &regionName )
   }
   else
   {
+    regionBlocks.push_back(
+      scene->addRect( selectedRegion->left() * unit , selectedRegion->bottom() * -unit ,
+                      selectedRegion->width() * unit , selectedRegion->height() * unit ,
+                      QPen( scene->palette().color( QPalette::Base ) ) ,
+                      QBrush( scene->palette().color( QPalette::Base ) ) ) );
+
     // setup splits
     for( double x : selectedRegion->hsplit() )
        splits.push_back(
@@ -169,8 +175,10 @@ void GlobalRouterViewer::fitToAll()
 
 void GlobalRouterViewer::fitToRegion()
 {
-  fitInView(  selectedRegion->left() * unit , selectedRegion->bottom() * -unit ,
-              selectedRegion->width() * unit , selectedRegion->height() * unit );
+  QRectF rect(  selectedRegion->left() * unit , selectedRegion->bottom() * -unit ,
+                selectedRegion->width() * unit , selectedRegion->height() * unit );
+
+  fitInView( rect );
 }
 
 void GlobalRouterViewer::keyPressEvent( QKeyEvent *event )

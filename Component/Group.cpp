@@ -41,8 +41,8 @@ QTextStream &operator>>(QTextStream &stream, Group &group)
         word = stream.readLine();
         group.vsplit().push_back( word.toDouble() );
       }
-      group.setBottom( group.vsplit().front () );
-      group.setTop   ( group.vsplit().back  () );
+      group.setTop   ( group.vsplit().front () );
+      group.setBottom( group.vsplit().back  () );
       break;
     }
   }
