@@ -44,6 +44,8 @@ class GlobalRouterViewer : public QGraphicsView
     QList<QGraphicsRectItem*> regionBlocks;
     QGraphicsRectItem*        selectedBlock = nullptr;
 
+    QList<QGraphicsLineItem*> selectedNet;
+
     QMap<QString,QList<QGraphicsLineItem*>> nets;
     QMap<QString,QGraphicsRectItem*>        blocks;
 

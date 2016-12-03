@@ -168,12 +168,64 @@ void GlobalRouterViewer::updateNet( const QString &netName )
 
 void GlobalRouterViewer::selectNet( const QString &netName )
 {
-  Q_UNUSED( netName )
+  if( !routingGraph ) return;
+
+  QVector<Net> &nets = routingGraph->nets();
+
+  if( !selectedNet.empty() )
+  {
+    for( auto item : selectedNet )
+       scene->removeItem( item );
+    selectedNet.clear();
+  }
+
+  auto it = std::find_if( nets.begin() , nets.end() ,
+                          [&]( const Net &net ) { return ( net.name() == netName ); } );
+
+  if( it == nets.end() ) return;
+
+  for( const Path &pathT : it->paths() )
+  {
+     const QVector<QPoint>  &path   = pathT.path();
+     QVector<double>        &hsplit = pathT.belongRegion()->hsplit();
+     QVector<double>        &vsplit = pathT.belongRegion()->vsplit();
+
+     for( int i = 0 ; i < path.size() - 1 ; ++i )
+     {
+        const QPoint &p1 = path[i];
+        const QPoint &p2 = path[i+1];
+
+        double x1 = ( hsplit[p1.x()] + hsplit[p1.x()+1] ) / 2;
+        double y1 = ( vsplit[p1.y()] + vsplit[p1.y()+1] ) / 2;
+        double x2 = ( hsplit[p2.x()] + hsplit[p2.x()+1] ) / 2;
+        double y2 = ( vsplit[p2.y()] + vsplit[p2.y()+1] ) / 2;
+
+        selectedNet.push_back( scene->addLine(  x1 * unit , y1 * -unit ,
+                                                x2 * unit , y2 * -unit ,
+                                                QPen( Qt::darkGreen ) ) );
+     }
+  }
 }
 
 void GlobalRouterViewer::updateBlock( const QString &blockName )
 {
-  Q_UNUSED( blockName )
+  if( !routingGraph ) return;
+
+  if( blocks.find( blockName ) == blocks.end() )
+  {
+    Block *block = routingGraph->getBlock( blockName );
+
+    blocks.insert(  blockName ,
+                    scene->addRect( block->left() * unit , block->bottom() * -unit ,
+                                    block->width() * unit , block->height() * unit ,
+                                    QPen( Qt::blue ) ,
+                                    QBrush( Qt::blue , Qt::Dense6Pattern ) ) );
+  }
+  else
+  {
+    scene->removeItem( blocks[blockName] );
+    blocks.remove( blockName );
+  }
 }
 
 void GlobalRouterViewer::fitToAll()
