@@ -129,14 +129,15 @@ void RoutingGraphInfo::updateSymmetryCombo( const QString &groupName )
 
   if( groupName != "ALL" )
   {
-    Group &group = *find_if(  routingGraph->groups().begin() ,
-                              routingGraph->groups().end() ,
-                              [&]( const Group &group )
-                              { return ( group.name() == groupName ); } );
+    auto it = find_if( routingGraph->groups().begin() , routingGraph->groups().end() ,
+                       [&]( const Group &group )
+                       { return ( group.name() == groupName ); } );
+
+    if( it == routingGraph->groups().end() ) return;
 
     symmetryCombo->addItem( "ALL" );
 
-    for( const Symmetry &symmetry : group.symmetrys() )
+    for( const Symmetry &symmetry : it->symmetrys() )
        symmetryCombo->addItem( symmetry.name() );
 
     symmetryCombo->setCurrentIndex( 0 );
@@ -182,12 +183,11 @@ void RoutingGraphInfo::updateBlockCombo( const QString &containerName )
   {
     if( groupCombo->currentText() != "ALL" )
     {
-      Group &group =
-        *find_if( routingGraph->groups().begin() , routingGraph->groups().end() ,
-                  [&]( const Group &group )
-                  { return ( group.name() == groupCombo->currentText() ); } );
+      RoutingRegion *group = routingGraph->getRegion( groupCombo->currentText() );
 
-      for( const Block &block : group.blocks() )
+      if( !group ) return;
+
+      for( const Block &block : group->blocks() )
          blockCombo->addItem( block.name() );
     }
     else
