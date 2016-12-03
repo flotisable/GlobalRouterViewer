@@ -42,7 +42,7 @@ class GlobalRouterViewer : public QGraphicsView
     RoutingRegion             *selectedRegion = nullptr;
     QList<QGraphicsLineItem*> splits;
     QList<QGraphicsRectItem*> regionBlocks;
-    QList<QGraphicsRectItem*> symmetryBlocks;
+    QGraphicsRectItem*        selectedBlock = nullptr;
 
     QMap<QString,QList<QGraphicsLineItem*>> nets;
     QMap<QString,QGraphicsRectItem*>        blocks;

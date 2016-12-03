@@ -105,7 +105,17 @@ void GlobalRouterViewer::selectRegion( const QString &regionName )
 
 void GlobalRouterViewer::selectBlock( const QString &blockName )
 {
-  Q_UNUSED( blockName )
+  if( !routingGraph ) return;
+  if( selectedBlock ) scene->removeItem( selectedBlock );
+
+  Block *block = routingGraph->getBlock( blockName );
+
+  if( !block ) return;
+
+  selectedBlock = scene->addRect( block->left() * unit , block->bottom() * -unit ,
+                                  block->width() * unit , block->height() * unit ,
+                                  QPen( Qt::red ) ,
+                                  QBrush( Qt::red , Qt::Dense6Pattern ) );
 }
 
 void GlobalRouterViewer::updateNet( const QString &netName )
