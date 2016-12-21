@@ -30,7 +30,6 @@ QVector<QPoint> RoutingRegion::connectedPin( Net &net )
             --y;
             break;
           }
-
        pins.push_back( QPoint( x , y ) );
      }
   }
@@ -52,4 +51,12 @@ Block* RoutingRegion::getBlock( const QString &name )
                       [&]( const Block &block ) { return block.name() == name; } );
 
   return ( it != mBlocks.end() ) ? &( *it ) : nullptr;
+}
+
+const Block* RoutingRegion::getBlock( const QString &name ) const
+{
+  for( const Block &block : blocks() )
+     if( block.name() == name ) return &block;
+
+  return nullptr;
 }

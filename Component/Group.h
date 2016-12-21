@@ -12,9 +12,11 @@ class Group : public RoutingRegion
 {
   public:
   
-    inline QVector<Symmetry>& symmetrys ();
+    inline QVector<Symmetry>&       symmetrys();
+    inline const QVector<Symmetry>& symmetrys() const;
 
-    virtual Block* getBlock( const QString &name ) override;
+    virtual Block*        getBlock( const QString &name ) override;
+    virtual const Block*  getBlock( const QString &name ) const override;
   
   private:
 
@@ -23,6 +25,7 @@ class Group : public RoutingRegion
 
 QTextStream& operator>>( QTextStream &stream , Group &group );
 
-inline QVector<Symmetry>& Group::symmetrys() { return mSymmetrys; }
+inline QVector<Symmetry>&       Group::symmetrys()        { return mSymmetrys; }
+inline const QVector<Symmetry>& Group::symmetrys() const  { return mSymmetrys; }
 
 #endif

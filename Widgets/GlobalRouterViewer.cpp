@@ -141,6 +141,8 @@ void GlobalRouterViewer::updateNet( const QString &netName )
          QVector<double> &hsplit  = selectedRegion->hsplit();
          QVector<double> &vsplit  = selectedRegion->vsplit();
 
+         QPen pen( ( pathT.layer() == 0 ) ? Qt::darkGreen : Qt::darkYellow );
+
          for( int i = 0 ; i < path.size() - 1 ; ++i )
          {
             QPoint &p1 = path[i];
@@ -153,7 +155,7 @@ void GlobalRouterViewer::updateNet( const QString &netName )
 
             pathItems.push_back( scene->addLine(  x1 * unit , -y1 * unit ,
                                                   x2 * unit , -y2 * unit ,
-                                                  QPen( Qt::darkGreen ) ) );
+                                                  pen ) );
          }
          this->nets.insert( netName , pathItems );
        }

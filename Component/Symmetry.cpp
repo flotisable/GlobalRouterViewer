@@ -31,3 +31,10 @@ Block* Symmetry::getBlock( const QString &name )
      if( block.name() == name ) return &block;
   return nullptr;
 }
+
+const Block* Symmetry::getBlock( const QString &name ) const
+{
+  for( const Block &block : blocks() )
+     if( block.name() == name ) return &block;
+  return nullptr;
+}

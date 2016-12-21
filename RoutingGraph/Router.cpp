@@ -140,12 +140,49 @@ Block* Router::getBlock( const QString & name )
   return RoutingRegion::getBlock( name );
 }
 
+const Block* Router::getBlock( const QString &name ) const
+{
+  for( const Group &group : groups() )
+  {
+    const Block *block = group.getBlock( name );
+
+    if( block ) return block;
+  }
+  return RoutingRegion::getBlock( name );
+}
+
 RoutingRegion* Router::getRegion( const QString &name )
 {
   if( this->name() == name ) return this;
 
   for( Group &group : groups() )
      if( group.name() == name ) return &group;
+
+  return nullptr;
+}
+
+const RoutingRegion* Router::getRegion( const QString &name ) const
+{
+  if( this->name() == name ) return this;
+
+  for( const Group &group : groups() )
+     if( group.name() == name ) return &group;
+
+  return nullptr;
+}
+
+Net* Router::getNet(const QString &name)
+{
+  for( Net &net : nets() )
+     if( net.name() == name ) return &net;
+
+  return nullptr;
+}
+
+const Net *Router::getNet(const QString &name) const
+{
+  for( const Net &net : nets() )
+     if( net.name() == name ) return &net;
 
   return nullptr;
 }

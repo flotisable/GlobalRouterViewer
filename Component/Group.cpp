@@ -5,7 +5,7 @@ using namespace std;
 
 #include "Pin.h"
 
-QTextStream &operator>>(QTextStream &stream, Group &group)
+QTextStream &operator>>( QTextStream &stream, Group &group )
 {
   QString word;
 
@@ -103,6 +103,17 @@ Block* Group::getBlock( const QString &name )
   for( Symmetry &symmetry : symmetrys() )
   {
      Block *block = symmetry.getBlock( name );
+
+     if( block ) return block;
+  }
+  return RoutingRegion::getBlock( name );
+}
+
+const Block* Group::getBlock( const QString &name ) const
+{
+  for( const Symmetry &symmetry : symmetrys() )
+  {
+     const Block *block = symmetry.getBlock( name );
 
      if( block ) return block;
   }

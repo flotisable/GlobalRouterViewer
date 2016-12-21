@@ -6,12 +6,14 @@ QTextStream& operator>>( QTextStream &stream  , Path &path )
 {
   RoutingRegion *region = new Router;
   QString       name;
+  int           pathLayer;
   int           pathNum;
 
-  stream >> name >> pathNum;
+  stream >> name >> pathLayer >> pathNum;
 
   region->setName( name );
 
+  path.setLayer( pathLayer );
   path.setBelongRegion( region );
 
   for( int i = 0 ; i < pathNum ; ++i )
