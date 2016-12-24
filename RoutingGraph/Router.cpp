@@ -38,8 +38,8 @@ QTextStream& operator>>( QTextStream &stream , Router &router )
         word = stream.readLine();
         router.vsplit().push_back( word.toDouble() );
       }
-      router.setBottom( router.vsplit().front () );
-      router.setTop   ( router.vsplit().back  () );
+      router.setTop   ( router.vsplit().front () );
+      router.setBottom( router.vsplit().back  () );
       break;
     }
   }

@@ -10,6 +10,7 @@ GlobalRouterViewer::GlobalRouterViewer( QWidget *parent ) : QGraphicsView( paren
   scene = new QGraphicsScene( this );
 
   setScene( scene );
+  setMouseTracking( true );
 }
 
 GlobalRouterViewer::GlobalRouterViewer( QGraphicsScene *scene, QWidget *parent )
@@ -18,6 +19,7 @@ GlobalRouterViewer::GlobalRouterViewer( QGraphicsScene *scene, QWidget *parent )
   this->scene = scene;
 
   setScene( scene );
+  setMouseTracking( true );
 }
 
 void GlobalRouterViewer::setRoutingGraph( Router *routingGraph )
@@ -148,6 +150,8 @@ void GlobalRouterViewer::updateNet( const QString &netName )
             QPoint &p1 = path[i];
             QPoint &p2 = path[i+1];
 
+            if( p1.x() != p2.x() && p1.y() != p2.y() ) continue;
+
             qreal x1 = ( hsplit[p1.x()] + hsplit[p1.x()+1] ) / 2;
             qreal x2 = ( hsplit[p2.x()] + hsplit[p2.x()+1] ) / 2;
             qreal y1 = ( vsplit[p1.y()] + vsplit[p1.y()+1] ) / 2;
@@ -247,8 +251,6 @@ void GlobalRouterViewer::fitToRegion()
 
 void GlobalRouterViewer::keyPressEvent( QKeyEvent *event )
 {
-  constexpr double unit = 10;
-
   switch( event->key() )
   {
     case Qt::Key_Z:
@@ -257,15 +259,69 @@ void GlobalRouterViewer::keyPressEvent( QKeyEvent *event )
       {
         case Qt::ShiftModifier:   scale( 2 , 2 );     break;
         case Qt::ControlModifier: scale( 0.5 , 0.5 ); break;
+        case Qt::NoModifier:      zoomState = true;   break;
       }
       break;
 
-    case Qt::Key_Up:    translate( 0 , -unit  ); break;
-    case Qt::Key_Down:  translate( 0 , unit   ); break;
-    case Qt::Key_Left:  translate( -unit  , 0 ); break;
-    case Qt::Key_Right: translate( unit   , 0 ); break;
+    case Qt::Key_Up:      translate( 0 , -unit  );  break;
+    case Qt::Key_Down:    translate( 0 , unit   );  break;
+    case Qt::Key_Left:    translate( -unit  , 0 );  break;
+    case Qt::Key_Right:   translate( unit   , 0 );  break;
+    case Qt::Key_Escape:  zoomState = false;        break;
 
     default: break;
   }
   QGraphicsView::keyPressEvent( event );
 }
+
+void GlobalRouterViewer::mousePressEvent( QMouseEvent *event )
+{
+  if( zoomState )
+  {
+    if( zoomStartSelected )
+    {
+      QPointF  end = mapToScene( event->pos() );
+      QRectF   rect;
+
+      rect.setTop   ( std::min( zoomStart.y() , end.y() ) );
+      rect.setBottom( std::max( zoomStart.y() , end.y() ) );
+      rect.setLeft  ( std::min( zoomStart.x() , end.x() ) );
+      rect.setRight ( std::max( zoomStart.x() , end.x() ) );
+
+      fitInView( rect );
+      scene->removeItem( zoomItem );
+    }
+    else
+    {
+      zoomStart = mapToScene( event->pos() );
+    }
+
+    zoomStartSelected = !zoomStartSelected;
+  }
+  else
+  {
+    zoomStartSelected = false;
+  }
+}
+
+void GlobalRouterViewer::mouseMoveEvent( QMouseEvent *event )
+{
+  if( zoomState && zoomStartSelected )
+  {
+    QPointF  end = mapToScene( event->pos() );
+    QRectF   rect;
+
+    rect.setTop   ( std::min( zoomStart.y() , end.y() ) );
+    rect.setBottom( std::max( zoomStart.y() , end.y() ) );
+    rect.setLeft  ( std::min( zoomStart.x() , end.x() ) );
+    rect.setRight ( std::max( zoomStart.x() , end.x() ) );
+
+    if( zoomItem ) scene->removeItem( zoomItem );
+
+    zoomItem = scene->addRect( rect , QPen( Qt::red ) );
+  }
+  else
+    if( zoomItem ) scene->removeItem( zoomItem );
+}
+
+

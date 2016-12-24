@@ -29,11 +29,18 @@ class GlobalRouterViewer : public QGraphicsView
 
   protected:
 
-    void keyPressEvent( QKeyEvent *event ) Q_DECL_OVERRIDE;
+    void keyPressEvent  ( QKeyEvent   *event ) Q_DECL_OVERRIDE;
+    void mousePressEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
+    void mouseMoveEvent ( QMouseEvent *event ) Q_DECL_OVERRIDE;
 
   private:
 
-    static constexpr double unit = 10;
+    static constexpr double unit      = 10;
+
+    bool              zoomState         = false;
+    bool              zoomStartSelected = false;
+    QPointF           zoomStart;
+    QGraphicsRectItem *zoomItem         = nullptr;
 
     QGraphicsScene *scene;
 
